@@ -4,7 +4,7 @@ const db = require('@cyclic.sh/dynamodb')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
+app.set("view engine", "ejs");
 // #############################################################################
 // This configures static hosting for files in /public that have the extensions
 // listed in the array.
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }))
 // #############################################################################
 
 // Create or Update an item
-app.post('/:col/:key', async (req, res) => {
+app.post('/api/:col/:key', async (req, res) => {
   console.log(req.body)
 
   const col = req.params.col
@@ -32,7 +32,7 @@ app.post('/:col/:key', async (req, res) => {
 })
 
 // Delete an item
-app.delete('/:col/:key', async (req, res) => {
+app.delete('/api/:col/:key', async (req, res) => {
   const col = req.params.col
   const key = req.params.key
   console.log(`from collection: ${col} delete key: ${key} with params ${JSON.stringify(req.params)}`)
@@ -42,7 +42,7 @@ app.delete('/:col/:key', async (req, res) => {
 })
 
 // Get a single item
-app.get('/:col/:key', async (req, res) => {
+app.get('/api/:col/:key', async (req, res) => {
   const col = req.params.col
   const key = req.params.key
   console.log(`from collection: ${col} get key: ${key} with params ${JSON.stringify(req.params)}`)
@@ -52,12 +52,20 @@ app.get('/:col/:key', async (req, res) => {
 })
 
 // Get a full listing
-app.get('/:col', async (req, res) => {
+app.get('/api/:col', async (req, res) => {
   const col = req.params.col
   console.log(`list collection: ${col} with params: ${JSON.stringify(req.params)}`)
   const items = await db.collection(col).list()
   console.log(JSON.stringify(items, null, 2))
   res.json(items).end()
+})
+
+app.get('/', (req, res) => {
+  res.render('index', { title: 'Hey', message: 'Hello there!' })
+})
+
+app.get('/calculator', (req, res) => {
+  res.render('calculator', { title: 'Hey', message: 'A Calculator!' })
 })
 
 // Catch all handler for all other request.
